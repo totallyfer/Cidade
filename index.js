@@ -125,19 +125,16 @@ async function generateCidadeRankingImage(playersArray, page = 0, dbSettings = {
     const ctx = canvas.getContext('2d');
     const selectedColor = COLOR_MAP[dbSettings.tabelaCor] || '#f1c40f';
 
-    // Fundo geral
     ctx.fillStyle = selectedColor;
     ctx.fillRect(0, 0, W, H);
     ctx.fillStyle = 'rgba(15, 15, 18, 0.90)';
     ctx.fillRect(0, 0, W, H);
 
-    // Título Principal
     ctx.fillStyle = '#ffffff';
     ctx.font = 'bold 28px sans-serif';
     ctx.textAlign = 'center';
     ctx.fillText((dbSettings.tabelaNome || 'CIDADE - RANKING').toUpperCase(), W / 2, 45);
 
-    // Subtítulo / Indicador
     ctx.fillStyle = selectedColor;
     ctx.font = 'bold 12px sans-serif';
     ctx.fillText(`EXIBINDO DO 1 AO 10 (BANCO)`, W / 2, 75);
@@ -154,24 +151,20 @@ async function generateCidadeRankingImage(playersArray, page = 0, dbSettings = {
         const p = current[i];
         const rank = startIdx + i + 1;
 
-        // Caixa de cada usuário
         ctx.fillStyle = 'rgba(30, 31, 34, 0.85)';
         roundRect(ctx, 40, startY, 720, 55, 8, true, false);
 
-        // Barra lateral colorida de rank
         if (rank === 1) ctx.fillStyle = '#f1c40f';
         else if (rank === 2) ctx.fillStyle = '#95a5a6';
         else if (rank === 3) ctx.fillStyle = '#d35400';
         else ctx.fillStyle = selectedColor;
         ctx.fillRect(40, startY, 5, 55);
 
-        // Posição #${rank}
         ctx.fillStyle = rank === 1 ? '#f1c40f' : rank === 2 ? '#95a5a6' : rank === 3 ? '#d35400' : '#ffffff';
         ctx.font = 'bold 18px sans-serif';
         ctx.textAlign = 'left';
         ctx.fillText(`#${rank}`, 65, startY + 34);
 
-        // Avatar
         let avatarImg = null;
         try {
             if (p.avatarURL) avatarImg = await loadImage(p.avatarURL);
@@ -186,12 +179,10 @@ async function generateCidadeRankingImage(playersArray, page = 0, dbSettings = {
             ctx.fill();
         }
 
-        // Nome do Usuário
         ctx.fillStyle = '#ffffff';
         ctx.font = 'bold 16px sans-serif';
         ctx.fillText((p.username || 'Cidadão').slice(0, 20), 175, startY + 34);
 
-        // Moeda e Quantidade no Banco
         ctx.fillStyle = '#f1c40f';
         ctx.font = 'bold 18px sans-serif';
         ctx.textAlign = 'right';
@@ -248,7 +239,7 @@ async function buildCidadeTabelaMessage(players, page, dbSettings, clientInstanc
 // --- REGISTO DE COMANDOS SLASH ---
 // ============================================================
 client.once('ready', async () => {
-    console.log(`Bot de Economia/Cidade online como ${client.user.tag}!`);
+    console.log(`Bot de Cidade / Economia online como ${client.user.tag}!`);
 
     const commands = [
         new SlashCommandBuilder()
@@ -295,7 +286,7 @@ client.once('ready', async () => {
 });
 
 // ============================================================
-// --- MANUTENÇÃO DE INTERAÇÕES E COMANDOS ---
+// --- GESTÃO DE INTERAÇÕES E COMANDOS ---
 // ============================================================
 client.on('interactionCreate', async interaction => {
     const db = loadDB();
@@ -310,7 +301,6 @@ client.on('interactionCreate', async interaction => {
     if (interaction.isChatInputCommand()) {
         const { commandName } = interaction;
 
-        // --- /PAINEL ---
         if (commandName === 'painel') {
             if (!interaction.member.permissions.has(PermissionFlagsBits.ModerateMembers) && !interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
                 return await interaction.reply({ content: '❌ Apenas membros com permissão de **Moderação** ou **Administrador** podem aceder ao painel da cidade!', ephemeral: true });
@@ -337,7 +327,6 @@ client.on('interactionCreate', async interaction => {
             return await interaction.reply({ embeds: [embed], components: [row] });
         }
 
-        // --- /TABELA CIDADE ---
         if (commandName === 'tabela') {
             const modo = interaction.options.getString('modo');
             if (modo === 'cidade') {
@@ -353,7 +342,6 @@ client.on('interactionCreate', async interaction => {
             }
         }
 
-        // --- /WORK (Flee the Facility) ---
         if (commandName === 'work') {
             const userId = interaction.user.id;
             const now = Date.now();
@@ -397,7 +385,6 @@ client.on('interactionCreate', async interaction => {
             return await interaction.reply({ embeds: [embed] });
         }
 
-        // --- /JOB ---
         if (commandName === 'job') {
             const userId = interaction.user.id;
             const now = Date.now();
@@ -441,7 +428,6 @@ client.on('interactionCreate', async interaction => {
             return await interaction.reply({ embeds: [embed] });
         }
 
-        // --- /SLUT ---
         if (commandName === 'slut') {
             const userId = interaction.user.id;
             const now = Date.now();
@@ -482,7 +468,6 @@ client.on('interactionCreate', async interaction => {
             }
         }
 
-        // --- /DAILY ---
         if (commandName === 'daily') {
             const userId = interaction.user.id;
             const now = Date.now();
@@ -515,7 +500,6 @@ client.on('interactionCreate', async interaction => {
             return await interaction.reply({ embeds: [embed], components: [row], ephemeral: true });
         }
 
-        // --- /MONEYINFO ---
         if (commandName === 'moneyinfo') {
             const targetUser = interaction.options.getUser('usuario') || interaction.user;
             const userObj = ensureUser(targetUser.id);
@@ -535,7 +519,6 @@ client.on('interactionCreate', async interaction => {
             return await interaction.reply({ embeds: [embed] });
         }
 
-        // --- /DEP ---
         if (commandName === 'dep') {
             const userId = interaction.user.id;
             const userObj = ensureUser(userId);
@@ -568,7 +551,6 @@ client.on('interactionCreate', async interaction => {
             return await interaction.reply({ embeds: [embed] });
         }
 
-        // --- /ROB ---
         if (commandName === 'rob') {
             const robberId = interaction.user.id;
             const targetUser = interaction.options.getUser('usuario');
