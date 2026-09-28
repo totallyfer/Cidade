@@ -1,7 +1,7 @@
 {
   "name": "bot-1v1-sfc",
   "version": "1.0.0",
-  "description": "Sistema completo de 1v1 para Discord",
+  "description": "Sistema completo de 1v1 e Cidade para Discord",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
