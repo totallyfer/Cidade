@@ -191,7 +191,7 @@ async function generateCidadeRankingImage(playersArray, page = 0, dbSettings = {
         ctx.font = 'bold 16px sans-serif';
         ctx.fillText((p.username || 'Cidadão').slice(0, 20), 175, startY + 34);
 
-        // Moeda (Ícone simulado ou texto estilizado) e Quantidade no Banco
+        // Moeda e Quantidade no Banco
         ctx.fillStyle = '#f1c40f';
         ctx.font = 'bold 18px sans-serif';
         ctx.textAlign = 'right';
@@ -300,7 +300,6 @@ client.once('ready', async () => {
 client.on('interactionCreate', async interaction => {
     const db = loadDB();
 
-    // Helper para garantir perfil do usuário
     const ensureUser = (userId) => {
         if (!db.users[userId]) {
             db.users[userId] = { userId, wallet: 0, bank: 0 };
@@ -358,7 +357,7 @@ client.on('interactionCreate', async interaction => {
         if (commandName === 'work') {
             const userId = interaction.user.id;
             const now = Date.now();
-            const cooldownTime = 10 * 60 * 1000; // 10 minutos
+            const cooldownTime = 10 * 60 * 1000;
 
             if (cooldowns.work.has(userId)) {
                 const expiration = cooldowns.work.get(userId) + cooldownTime;
@@ -402,7 +401,7 @@ client.on('interactionCreate', async interaction => {
         if (commandName === 'job') {
             const userId = interaction.user.id;
             const now = Date.now();
-            const cooldownTime = 10 * 60 * 1000; // 10 minutos
+            const cooldownTime = 10 * 60 * 1000;
 
             if (cooldowns.job.has(userId)) {
                 const expiration = cooldowns.job.get(userId) + cooldownTime;
@@ -487,7 +486,7 @@ client.on('interactionCreate', async interaction => {
         if (commandName === 'daily') {
             const userId = interaction.user.id;
             const now = Date.now();
-            const cooldownTime = 24 * 60 * 60 * 1000; // 24 horas
+            const cooldownTime = 24 * 60 * 60 * 1000;
 
             if (cooldowns.daily.has(userId)) {
                 const expiration = cooldowns.daily.get(userId) + cooldownTime;
@@ -588,11 +587,9 @@ client.on('interactionCreate', async interaction => {
                 return await interaction.reply({ content: `❌ **${targetUser.username}** não tem dinheiro na carteira para ser roubado!`, ephemeral: true });
             }
 
-            // 70% chance de dar errado, 30% chance de dar certo
             const success = Math.random() < 0.30;
 
             if (success) {
-                // Rouba entre 10% a 40% da carteira do alvo
                 const stolenAmount = Math.floor(targetObj.wallet * (Math.random() * 0.30 + 0.10));
                 targetObj.wallet -= stolenAmount;
                 robberObj.wallet += stolenAmount;
@@ -604,7 +601,6 @@ client.on('interactionCreate', async interaction => {
                     .setColor(0x2ECC71);
                 return await interaction.reply({ embeds: [embed] });
             } else {
-                // Dá errado: Perde 30% do dinheiro que tem (carteira ou banco) e vai para o alvo
                 const totalRobberMoney = robberObj.wallet + robberObj.bank;
                 const penalty = Math.floor(totalRobberMoney * 0.30);
 
@@ -622,16 +618,14 @@ client.on('interactionCreate', async interaction => {
 
                 const embed = new EmbedBuilder()
                     .setTitle('🚨 Assalto Fracassado!')
-                    .setDescription(`Foste pego em flagrante tentado roubar **${targetUser.username}**! Tiveste de pagar uma penalidade de **30%** do teu dinheiro (**${penalty.toLocaleString()}** moedas), que foi direto para a vítima!`)
+                    .setDescription(`Foste pego em flagrante tentando roubar **${targetUser.username}**! Tiveste de pagar uma penalidade de **30%** do teu dinheiro (**${penalty.toLocaleString()}** moedas), que foi direto para a vítima!`)
                     .setColor(0xE74C3C);
                 return await interaction.reply({ embeds: [embed] });
             }
         }
     }
 
-    // --- INTERAÇÕES DE BOTÕES E MODAIS DO PAINEL / DAILY ---
     if (interaction.isButton()) {
-        // Resgatar Daily
         if (interaction.customId.startsWith('resgatar_daily_')) {
             const parts = interaction.customId.split('_');
             const userId = parts[2];
@@ -654,7 +648,6 @@ client.on('interactionCreate', async interaction => {
             return;
         }
 
-        // Navegação da Tabela Cidade
         if (interaction.customId.startsWith('cidade_prev_') || interaction.customId.startsWith('cidade_next_')) {
             await interaction.deferUpdate();
             const pageChange = interaction.customId.startsWith('cidade_next_') ? 1 : -1;
@@ -675,7 +668,6 @@ client.on('interactionCreate', async interaction => {
             }
         }
 
-        // Ações do Painel Administrativo
         if (interaction.customId.startsWith('cidade_')) {
             if (!interaction.member.permissions.has(PermissionFlagsBits.ModerateMembers) && !interaction.member.permissions.has(PermissionFlagsBits.Administrator)) {
                 return await interaction.reply({ content: '❌ Não tens permissão para usar estes botões.', ephemeral: true });
@@ -749,7 +741,6 @@ client.on('interactionCreate', async interaction => {
         }
     }
 
-    // --- SELEÇÃO DE COR DO PAINEL ---
     if (interaction.isStringSelectMenu() && interaction.customId === 'select_cidade_cor') {
         const novaCor = interaction.values[0];
         db.settings.tabelaCor = novaCor;
@@ -757,7 +748,6 @@ client.on('interactionCreate', async interaction => {
         return await interaction.update({ content: `✅ Cor temática alterada com sucesso para **${novaCor.toUpperCase()}**!`, components: [] });
     }
 
-    // --- SUBMISSÃO DE MODAIS ---
     if (interaction.isModalSubmit()) {
         if (interaction.customId === 'modal_cidade_titulo') {
             const novoTitulo = interaction.fields.getTextInputValue('input_novo_titulo');
